@@ -18,17 +18,22 @@ function validateAuthRequest(req, res,next){
     next();
 }
 
-async function checkAuth(req, res,next){
+async function checkAuth(req, res, next) {
     try {
-        const response=await UserService.isAuthenticated(req.headers['x-access-token']);
-        if(response){
-             req.user=response;
-             next();
+        const response = await UserService.isAuthenticated(req.headers['x-access-token']);
+        if (response) {
+            req.user = response;
+            return next();
         }
+        // Handle the case when authentication fails
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+            message: 'Unauthorized',
+            error: new AppError(['Authentication failed'], StatusCodes.UNAUTHORIZED),
+        });
     } catch (error) {
-       return res.status(error.statusCode).json(error);
+        // Handle other errors
+        return res.status(error.statusCode).json(error);
     }
-    next();
 }
 
 module.exports={

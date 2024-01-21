@@ -30,6 +30,7 @@ async function signIn(req, res) {
     return res.status(error.statusCode).json(ErrorResponse);
   }
 }
+
 async function addRoletoUser(req, res) {
   try {
     const response = await UserService.addRoletoUser({
@@ -44,9 +45,25 @@ async function addRoletoUser(req, res) {
   }
 }
 
+async function destroyFlight(req,res){
+  try{
+      const response= await UserService.destroyFlight({
+         flightId:req.body.flightId,
+      });
+      SuccessResponse.data=response.data.success.data;
+      return res.
+      status(StatusCodes.CREATED).
+      json(SuccessResponse.success);
+  } catch(error){
+      ErrorResponse.error.error=error;
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
+  }
+}
+
 
 module.exports={
     signUp,
     signIn,
-    addRoletoUser
+    addRoletoUser,
+    destroyFlight
 }

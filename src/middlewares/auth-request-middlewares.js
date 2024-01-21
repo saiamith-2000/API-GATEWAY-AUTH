@@ -46,8 +46,20 @@ async function isAdmin(req,res,next){
     next();
 }
 
+async function isAuthorizedtomodifyFlight(req,res,next){
+    const response1=await UserService.isAdmin(req.user);
+    const response2=await UserService.isFlightCompany(req.user);
+    if(!response1 && !response2){
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+            message: 'User not authorized for this action'
+        });
+    }
+    next();
+}
+
 module.exports={
     validateAuthRequest,
     checkAuth,
-    isAdmin
+    isAdmin,
+    isAuthorizedtomodifyFlight
 }

@@ -21,6 +21,11 @@ AuthRequestMiddlewares.isAdmin,
 UserController.addRoletoUser
 );
 
+router.post('/destroyFlight',
+AuthRequestMiddlewares.checkAuth,
+AuthRequestMiddlewares.isAuthorizedtomodifyFlight,
+UserController.destroyFlight
+);
 
 
 module.exports=router;

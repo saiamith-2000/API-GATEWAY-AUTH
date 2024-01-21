@@ -2,9 +2,11 @@ const {StatusCodes}=require('http-status-codes');
 const {UserRepository,RoleRepository}=require('../repositories');
 const { AppError } = require('../utils/errors/app-error');
 const {AUTH,ENUMS}=require('../utils/common');
-
+const axios=require('axios');
+const db=require('../models');
 const userRepository=new UserRepository();
 const roleRepository=new RoleRepository();
+const {ServerConfig}=require('../config');
 
 async function createUser(data){
     try {
@@ -80,6 +82,7 @@ async function addRoletoUser(data){
    }
 }
 
+
 async function isAdmin(id){
     try {
         const user=await userRepository.get(id);
@@ -87,9 +90,6 @@ async function isAdmin(id){
             throw new AppError('User not found by given id',StatusCodes.BAD_REQUEST);
         }
         const adminRole=await roleRepository.getRoleByName(ENUMS.USER_ROLES_ENUMS.ADMIN);
-        if(!adminRole){
-            throw new AppError('User is not admin',StatusCodes.BAD_REQUEST);
-        }
         return user.hasRole(adminRole);
     } catch (error) {
         if(error instanceof AppError){throw error;}
@@ -99,10 +99,47 @@ async function isAdmin(id){
 }
 
 
+async function isFlightCompany(id){
+    try {
+        const user=await userRepository.get(id);
+        if(!user){
+            throw new AppError('User not found by given id',StatusCodes.BAD_REQUEST);
+        }
+        const flightComapnyRole=await roleRepository.getRoleByName(ENUMS.USER_ROLES_ENUMS.FLIGHT_COMPANY);
+        return user.hasRole(flightComapnyRole);
+    } catch (error) {
+        if(error instanceof AppError){throw error;}
+        console.log(error);
+        throw new AppError('Something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+async function destroyFlight(data){
+    const transaction = await db.sequelize.transaction();
+    try {
+        const flight = await axios.get(`${ServerConfig.FLIGHT_SERVICE}api/v1/flights/${data.flightId}`);  
+        if(!flight){
+            throw new AppError('No such flight found',StatusCodes.BAD_REQUEST);
+        }
+        const response=await axios.delete(`${ServerConfig.FLIGHT_SERVICE}api/v1/flights/${data.flightId}`);
+        await transaction.commit();
+        return flight;
+    } catch (error) {
+        await transaction.rollback();
+        console.log(error);
+        throw error;
+    }
+}
+
+
+
 module.exports={
     createUser,
     signIn,
     isAuthenticated,
     addRoletoUser,
-    isAdmin
+    isAdmin,
+    isFlightCompany,
+    destroyFlight
 }

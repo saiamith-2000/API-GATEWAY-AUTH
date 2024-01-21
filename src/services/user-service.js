@@ -61,9 +61,48 @@ async function isAuthenticated(token){
    }    
 }
 
+async function addRoletoUser(data){
+   try {
+    const user=await userRepository.get(data.id);
+    if(!user){
+        throw new AppError('User not found by given id',StatusCodes.BAD_REQUEST);
+    }
+    const role=await roleRepository.getRoleByName(data.role);
+    if(!role){
+        throw new AppError('Role not found by given role data',StatusCodes.BAD_REQUEST);
+    }
+    user.addRole(role);
+    return user;
+   } catch (error) {
+    if(error instanceof AppError){throw error;}
+    console.log(error);
+    throw new AppError('Something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
+   }
+}
+
+async function isAdmin(id){
+    try {
+        const user=await userRepository.get(id);
+        if(!user){
+            throw new AppError('User not found by given id',StatusCodes.BAD_REQUEST);
+        }
+        const adminRole=await roleRepository.getRoleByName(ENUMS.USER_ROLES_ENUMS.ADMIN);
+        if(!adminRole){
+            throw new AppError('User is not admin',StatusCodes.BAD_REQUEST);
+        }
+        return user.hasRole(adminRole);
+    } catch (error) {
+        if(error instanceof AppError){throw error;}
+        console.log(error);
+        throw new AppError('Something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
 
 module.exports={
     createUser,
     signIn,
-    isAuthenticated
+    isAuthenticated,
+    addRoletoUser,
+    isAdmin
 }

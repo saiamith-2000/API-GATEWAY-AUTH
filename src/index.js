@@ -33,6 +33,10 @@ app.use(
 );
 app.use("/api", apiRoutes);
 
+app.get("/home",(req,res)=>{
+  return res.json({message: "OK"});
+});
+
 app.listen(ServerConfig.PORT, () => {
   console.log(`Successfully started server on port:${ServerConfig.PORT}`);
 });

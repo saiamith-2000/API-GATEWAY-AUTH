@@ -26,9 +26,13 @@ Lets take a look inside the `src` folder
   ```
   npm install
   ```
- - In the root directory create a `.env` file and add the following env variables
+ - In the root directory create a `.env` file and add env variables
     ```
         PORT=<port number of your choice>
+        SALT_ROUNDS=<add required number of rounds>
+        JWT_SECRET=<add a secure secret key of your choice>
+        JWT_EXPIRY=<how much time should the user key be valid>
+        FLIGHT_SEVICE,BOOKING_SERVICE=<address of flight & booking service>
     ```
     ex: 
     ```
@@ -45,4 +49,27 @@ Lets take a look inside the `src` folder
  - To run the server execute
  ```
  npm run dev
+
+ ```
+
+
+ Docker setup:
+ ```
+
+ docker build -t Api-Gateway-Auth .
+
+ ```
+ ```
+
+ docker network create micro-net
+
+ ```
+ ```
+ docker volume create api-gateway-node-modules 
+
+ ```
+ ```
+
+ docker run -it --init -p 3001:3001 --name=api_gateway --network micro-net -v "$(pwd)":/developer/nodejs/api-gateway -v api-gateway-node-modules:/developer/nodejs/api-gateway/node_modules api-gateway:latest 
+
  ```

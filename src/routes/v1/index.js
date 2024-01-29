@@ -5,6 +5,6 @@ const userRoutes=require('./user-routes');
 const router=express.Router();
 
 router.use('/user',userRoutes);
-router.get('/info',AuthRequestMiddlewares.checkAuth,InfoController.info);
+router.get('/info',InfoController.info);
 
 module.exports=router;
